@@ -25,7 +25,15 @@ const answerValue = document.getElementsByClassName('answer');
 const submitBtn = document.querySelector('#check');
 const message = document.querySelector('#message');
 const choices = document.querySelector('#choices');
+const score = document.getElementById('score');
 
+
+
+//set variables
+
+let startQuestion = 0; // start question at 0
+let currentQuestion; // store cuurent question init
+let keepScore = 0; // keep score
 // Make constructor function for create multiple question
 
 let Question = function (question, answer, correct) {
@@ -57,14 +65,16 @@ Question.prototype.checkAnswer = function (value) {
     if (this.correct === value) {
 
         answerIsRight(); // Show  right answer Message
-
+        keepScore += 1;
 
         if (isStillQuestion()) {
             nextQuestion();
         } else {
             startQuestion = 0;
+
             currentQuestion = startQuestion;
-            questions[startQuestion].showQuestion();
+            gameover();
+
         }
     } else {
         answerIsWrong(); // Show wrong answer Message
@@ -73,12 +83,25 @@ Question.prototype.checkAnswer = function (value) {
             nextQuestion(); // next question
         } else {
             startQuestion = 0;
+
             currentQuestion = startQuestion;
-            questions[startQuestion].showQuestion();
+            gameover()
 
         }
     }
+
+    if (keepScore <= (questions.length)) {
+        newScore = keepScore;
+        score.style.display = 'block';
+        score.textContent = `Your CurrentScore is : ${newScore}`;
+
+    } else {
+        gameover();
+
+    }
+
 }
+
 
 function isStillQuestion() {
     return questions.length - 1 >= startQuestion;
@@ -109,6 +132,23 @@ function setMessge(msg, color) {
     }, 3000);
 }
 
+function gameover() {
+    quiz.style.display = 'none';
+    message.style.display = 'none';
+    startBtn.style.display = 'block';
+    startBtn.textContent = 'Restart Game';
+    restart();
+}
+
+
+function restart() {
+    startBtn.classList.add('restart');
+    let restart = document.querySelector('.restart');
+    restart.addEventListener('click', function () {
+        document.location.reload();
+    });
+}
+
 
 // Create some question and store them in array
 
@@ -116,11 +156,13 @@ let questions = [new Question('What is your Name?', ['Ajay', 'Vijay'], 'Ajay'),
     new Question('Where are your From?', ['Pakistan', 'India', 'USA', 'Japan'], 'India'), new Question('What do you do?', ['Web Design', 'Study', 'Something Else'], 'Web Design')
 ];
 
-let startQuestion = 0;
-let currentQuestion;
+
+
 start.addEventListener('click', function () {
+
     // hide startbtn
     startBtn.style.display = 'none';
+
     currentQuestion = startQuestion;
     questions[startQuestion].showQuestion(); // show question
 
@@ -133,6 +175,7 @@ submitBtn.addEventListener('click', function () {
         if (answerValue[i].checked)
             answer = answerValue[i].value;
     }
+
 
     questions[currentQuestion].checkAnswer(answer);
 
